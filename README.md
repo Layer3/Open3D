@@ -1,3 +1,22 @@
+To test this, compile and install the pip package from this repo.
+
+ACTIVATE YOUR CONDA ENVIRONMENT BEFORE ANY OF THE CMAKE BUILD STEPS. If you don't, you will have to clear your build directories and start over.
+```
+git clone https://github.com/Layer3/Open3D.git
+```
+cd into the repo and make sure dependencies are installed by:
+```
+util/install_deps_ubuntu.sh
+```
+then:
+```
+mkdir build && cd build
+cmake ../
+make install-pip-package
+```
+This should build and install the custom open3d package. The Initial build will take a while as it compiles all dependencies from source. Incremental builds will be faster.
+
+
 <p align="center">
 <img src="https://raw.githubusercontent.com/isl-org/Open3D/master/docs/_static/open3d_logo_horizontal.png" width="320" />
 </p>
