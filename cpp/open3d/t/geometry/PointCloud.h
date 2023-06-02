@@ -574,6 +574,40 @@ public:
             int stride = 1,
             bool with_normals = false);
 
+    /// \brief Factory function to create a point cloud from a depth image and a
+    /// camera model.
+    ///
+    /// Given depth value d at (u, v) image coordinate, the corresponding 3d
+    /// point is:
+    /// - z = d / depth_scale
+    /// - x = (u - cx) * z / fx
+    /// - y = (v - cy) * z / fy
+    ///
+    /// \param depth The input depth image should be a uint16_t or float image.
+    /// \param intrinsics Intrinsic parameters of the camera.
+    /// \param extrinsics Extrinsic parameters of the camera.
+    /// \param depth_scale The depth is scaled by 1 / \p depth_scale.
+    /// \param depth_max Truncated at \p depth_max distance.
+    /// \param stride Sampling factor to support coarse point cloud extraction.
+    /// Unless \p with_normals=true, there is no low pass filtering, so aliasing
+    /// is possible for \p stride>1.
+    /// \param with_normals Also compute normals for the point cloud. If
+    /// True, the point cloud will only contain points with valid normals. If
+    /// normals are requested, the depth map is first filtered to ensure smooth
+    /// normals.
+    ///
+    /// \return Created point cloud with the 'points' property set. Thus is
+    /// empty if the conversion fails.
+    static PointCloud LukasCreateAndScale(
+            const Image &depth,
+            const core::Tensor &intrinsics,
+            const core::Tensor &extrinsics =
+                    core::Tensor::Eye(4, core::Float32, core::Device("CPU:0")),
+            float depth_scale = 1000.0f,
+            float depth_max = 3.0f,
+            int stride = 1,
+            bool with_normals = false);
+
     /// \brief Factory function to create a point cloud from an RGB-D image and
     /// a camera model.
     ///

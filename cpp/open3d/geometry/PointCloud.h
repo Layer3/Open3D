@@ -415,6 +415,37 @@ public:
             int stride = 1,
             bool project_valid_depth_only = true);
 
+    /// \brief Factory function to create a pointcloud from a depth image and a
+    /// camera model.
+    ///
+    /// Given depth value d at (u, v) image coordinate, the corresponding 3d
+    /// point is: z = d / depth_scale\n x = (u - cx) * z / fx\n y = (v - cy) * z
+    /// / fy\n
+    ///
+    /// \param depth The input depth image can be either a float image, or a
+    /// uint16_t image. \param intrinsic Intrinsic parameters of the camera.
+    /// \param extrinsic Extrinsic parameters of the camera.
+    /// \param depth_scale The depth is scaled by 1 / \p depth_scale.
+    /// \param depth_trunc Truncated at \p depth_trunc distance.
+    /// \param stride Sampling factor to support coarse point cloud extraction.
+    ///
+    /// \return An empty pointcloud if the conversion fails.
+    /// If \param project_valid_depth_only is true, return point cloud, which
+    /// doesn't
+    /// have nan point. If the value is false, return point cloud, which has
+    /// a point for each pixel, whereas invalid depth results in NaN points.
+    static std::shared_ptr<PointCloud> LukasCreateAndScale(
+            size_t every_k_points,
+            const Eigen::Matrix4d &transformation,
+            const AxisAlignedBoundingBox &aabb,
+            const Image &depth,
+            const camera::PinholeCameraIntrinsic &intrinsic,
+            const Eigen::Matrix4d &extrinsic = Eigen::Matrix4d::Identity(),
+            double depth_scale = 1000.0,
+            double depth_trunc = 1000.0,
+            int stride = 1,
+            bool project_valid_depth_only = true);
+
     /// \brief Factory function to create a pointcloud from an RGB-D image and a
     /// camera model.
     ///

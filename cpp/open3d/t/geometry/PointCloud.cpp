@@ -911,6 +911,36 @@ PointCloud PointCloud::CreateFromDepthImage(const Image &depth,
     }
 }
 
+PointCloud PointCloud::LukasCreateAndScale(const Image &depth,
+                                           const core::Tensor &intrinsics,
+                                           const core::Tensor &extrinsics,
+                                           float depth_scale,
+                                           float depth_max,
+                                           int stride,
+                                           bool with_normals){
+    core::AssertTensorDtypes(depth.AsTensor(), {core::UInt16, core::Float32});
+    core::AssertTensorShape(intrinsics, {3, 3});
+    core::AssertTensorShape(extrinsics, {4, 4});
+
+    core::Tensor intrinsics_host =
+            intrinsics.To(core::Device("CPU:0"), core::Float64);
+    core::Tensor extrinsics_host =
+            extrinsics.To(core::Device("CPU:0"), core::Float64);
+
+    if (with_normals) {
+        return CreatePointCloudWithNormals(depth, Image(), intrinsics_host,
+                                           extrinsics_host, depth_scale,
+                                           depth_max, stride);
+    } else {
+        core::Tensor points;
+        kernel::pointcloud::Unproject(depth.AsTensor(), utility::nullopt,
+                                      points, utility::nullopt, intrinsics_host,
+                                      extrinsics_host, depth_scale, depth_max,
+                                      stride);
+        return PointCloud(points);
+    }
+}
+
 PointCloud PointCloud::CreateFromRGBDImage(const RGBDImage &rgbd_image,
                                            const core::Tensor &intrinsics,
                                            const core::Tensor &extrinsics,

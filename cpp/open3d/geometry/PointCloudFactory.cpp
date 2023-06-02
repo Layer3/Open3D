@@ -152,6 +152,49 @@ std::shared_ptr<PointCloud> PointCloud::CreateFromDepthImage(
     return std::make_shared<PointCloud>();
 }
 
+std::shared_ptr<PointCloud> PointCloud::LukasCreateAndScale(
+        size_t every_k_points,
+        const Eigen::Matrix4d &transformation,
+        const AxisAlignedBoundingBox &aabb,
+        const Image &depth,
+        const camera::PinholeCameraIntrinsic &intrinsic,
+        const Eigen::Matrix4d &extrinsic /* = Eigen::Matrix4d::Identity()*/,
+        double depth_scale /* = 1000.0*/,
+        double depth_trunc /* = 1000.0*/,
+        int stride /* = 1*/,
+        bool project_valid_depth_only) {
+
+    std::shared_ptr<PointCloud> ptr = nullptr;
+    bool valid = false;
+
+    if (depth.num_of_channels_ == 1) {
+        if (depth.bytes_per_channel_ == 2) {
+            auto float_depth =
+                    depth.ConvertDepthToFloatImage(depth_scale, depth_trunc);
+            valid = true;
+            ptr = CreatePointCloudFromFloatDepthImage(
+                    *float_depth, intrinsic, extrinsic, stride,
+                    project_valid_depth_only);
+        } else if (depth.bytes_per_channel_ == 4) {
+            valid = true;
+            ptr = CreatePointCloudFromFloatDepthImage(
+                    depth, intrinsic, extrinsic, stride,
+                    project_valid_depth_only);
+        }
+    }
+
+    if (valid)
+    {
+        ptr->UniformDownSample(every_k_points);
+        ptr->Transform(transformation);
+        ptr->Crop(aabb);
+        return ptr;
+    }
+
+    utility::LogError("Unsupported image format.");
+    return std::make_shared<PointCloud>();
+}
+
 std::shared_ptr<PointCloud> PointCloud::CreateFromRGBDImage(
         const RGBDImage &image,
         const camera::PinholeCameraIntrinsic &intrinsic,

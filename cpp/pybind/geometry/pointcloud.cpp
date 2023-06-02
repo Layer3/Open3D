@@ -230,6 +230,19 @@ camera. Given depth value d at (u, v) image coordinate, the corresponding 3d poi
                     "depth_scale"_a = 1000.0, "depth_trunc"_a = 1000.0,
                     "stride"_a = 1, "project_valid_depth_only"_a = true)
             .def_static(
+                    "lukas_create_and_scale",
+                    &PointCloud::LukasCreateAndScale,
+                    R"(Factory function to create a pointcloud from a depth image and a
+camera. Given depth value d at (u, v) image coordinate, the corresponding 3d point is:
+
+    - z = d / depth_scale
+    - x = (u - cx) * z / fx
+    - y = (v - cy) * z / fy)",
+                    "depth"_a, "intrinsic"_a,
+                    "extrinsic"_a = Eigen::Matrix4d::Identity(),
+                    "depth_scale"_a = 1000.0, "depth_trunc"_a = 1000.0,
+                    "stride"_a = 1, "project_valid_depth_only"_a = true)
+            .def_static(
                     "create_from_rgbd_image", &PointCloud::CreateFromRGBDImage,
                     "Factory function to create a pointcloud from an RGB-D "
                     "image and a camera. Given depth value d at (u, "
@@ -396,6 +409,17 @@ camera. Given depth value d at (u, v) image coordinate, the corresponding 3d poi
             });
     docstring::ClassMethodDocInject(
             m, "PointCloud", "create_from_depth_image",
+            {{"depth",
+              "The input depth image can be either a float image, or a "
+              "uint16_t image."},
+             {"intrinsic", "Intrinsic parameters of the camera."},
+             {"extrnsic", "Extrinsic parameters of the camera."},
+             {"depth_scale", "The depth is scaled by 1 / depth_scale."},
+             {"depth_trunc", "Truncated at depth_trunc distance."},
+             {"stride",
+              "Sampling factor to support coarse point cloud extraction."}});
+    docstring::ClassMethodDocInject(
+            m, "PointCloud", "lukas_create_and_scale",
             {{"depth",
               "The input depth image can be either a float image, or a "
               "uint16_t image."},

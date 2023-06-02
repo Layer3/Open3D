@@ -327,6 +327,21 @@ Return:
             "a depth image and a camera model.\n\n Given depth value d at (u, "
             "v) image coordinate, the corresponding 3d point is:\n z = d / "
             "depth_scale\n\n x = (u - cx) * z / fx\n\n y = (v - cy) * z / fy");
+    // creation (static)
+    pointcloud.def_static(
+            "lukas_create_and_scale", &PointCloud::LukasCreateAndScale,
+            py::call_guard<py::gil_scoped_release>(), "every_k_points"_a,
+            "transformation"_a,
+            "aabb"_a,
+            "depth"_a, "intrinsics"_a,
+            "extrinsics"_a =
+                    core::Tensor::Eye(4, core::Float32, core::Device("CPU:0")),
+            "depth_scale"_a = 1000.0f, "depth_max"_a = 3.0f, "stride"_a = 1,
+            "with_normals"_a = false,
+            "Factory function to create a pointcloud (with only 'points') from "
+            "a depth image and a camera model.\n\n Given depth value d at (u, "
+            "v) image coordinate, the corresponding 3d point is:\n z = d / "
+            "depth_scale\n\n x = (u - cx) * z / fx\n\n y = (v - cy) * z / fy");
     pointcloud.def_static(
             "create_from_rgbd_image", &PointCloud::CreateFromRGBDImage,
             py::call_guard<py::gil_scoped_release>(), "rgbd_image"_a,
@@ -538,6 +553,8 @@ Example:
     docstring::ClassMethodDocInject(m, "PointCloud", "estimate_normals",
                                     map_shared_argument_docstrings);
     docstring::ClassMethodDocInject(m, "PointCloud", "create_from_depth_image",
+                                    map_shared_argument_docstrings);
+    docstring::ClassMethodDocInject(m, "PointCloud", "lukas_create_and_scale",
                                     map_shared_argument_docstrings);
     docstring::ClassMethodDocInject(m, "PointCloud", "create_from_rgbd_image",
                                     map_shared_argument_docstrings);
