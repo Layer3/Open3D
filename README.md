@@ -1,4 +1,6 @@
 To test this, compile and install the pip package from this repo.
+
+ACTIVATE YOUR CONDA ENVIRONMENT BEFORE ANY OF THE CMAKE BUILD STEPS. If you don't, you will have to clear your build directories and start over.
 ```
 git clone https://github.com/Layer3/Open3D.git
 ```
