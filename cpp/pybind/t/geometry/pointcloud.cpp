@@ -330,10 +330,10 @@ Return:
     // creation (static)
     pointcloud.def_static(
             "lukas_create_and_scale", &PointCloud::LukasCreateAndScale,
-            py::call_guard<py::gil_scoped_release>(), "every_k_points"_a,
+            py::call_guard<py::gil_scoped_release>(),
+            "every_k_points"_a,
             "transformation"_a,
-            "aabb"_a,
-            "depth"_a, "intrinsics"_a,
+            "aabb"_a,"depth"_a, "intrinsics"_a,
             "extrinsics"_a =
                     core::Tensor::Eye(4, core::Float32, core::Device("CPU:0")),
             "depth_scale"_a = 1000.0f, "depth_max"_a = 3.0f, "stride"_a = 1,
@@ -555,7 +555,18 @@ Example:
     docstring::ClassMethodDocInject(m, "PointCloud", "create_from_depth_image",
                                     map_shared_argument_docstrings);
     docstring::ClassMethodDocInject(m, "PointCloud", "lukas_create_and_scale",
-                                    map_shared_argument_docstrings);
+                                    {{"every_k_points","number of points for downsampling"},
+                                     {"transformation", "The transformation"},
+                                     {"aabb", "Access aligned bounding box"},
+                                     {"depth",
+                                      "The input depth image can be either a float image, or a "
+                                      "uint16_t image."},
+                                     {"intrinsic", "Intrinsic parameters of the camera."},
+                                     {"extrnsic", "Extrinsic parameters of the camera."},
+                                     {"depth_scale", "The depth is scaled by 1 / depth_scale."},
+                                     {"depth_trunc", "Truncated at depth_trunc distance."},
+                                     {"stride",
+                                      "Sampling factor to support coarse point cloud extraction."}});
     docstring::ClassMethodDocInject(m, "PointCloud", "create_from_rgbd_image",
                                     map_shared_argument_docstrings);
     docstring::ClassMethodDocInject(

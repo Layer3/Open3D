@@ -599,6 +599,9 @@ public:
     /// \return Created point cloud with the 'points' property set. Thus is
     /// empty if the conversion fails.
     static PointCloud LukasCreateAndScale(
+            size_t every_k_points,
+            const core::Tensor &transformation,
+            const AxisAlignedBoundingBox &aabb,
             const Image &depth,
             const core::Tensor &intrinsics,
             const core::Tensor &extrinsics =

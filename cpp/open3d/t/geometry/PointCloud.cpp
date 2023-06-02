@@ -911,7 +911,10 @@ PointCloud PointCloud::CreateFromDepthImage(const Image &depth,
     }
 }
 
-PointCloud PointCloud::LukasCreateAndScale(const Image &depth,
+PointCloud PointCloud::LukasCreateAndScale(size_t every_k_points,
+                                           const core::Tensor &transformation,
+                                           const AxisAlignedBoundingBox &aabb,
+                                           const Image &depth,
                                            const core::Tensor &intrinsics,
                                            const core::Tensor &extrinsics,
                                            float depth_scale,
@@ -930,14 +933,15 @@ PointCloud PointCloud::LukasCreateAndScale(const Image &depth,
     if (with_normals) {
         return CreatePointCloudWithNormals(depth, Image(), intrinsics_host,
                                            extrinsics_host, depth_scale,
-                                           depth_max, stride);
+                                           depth_max, stride).UniformDownSample(every_k_points).Transform(transformation).Crop(aabb);
     } else {
         core::Tensor points;
         kernel::pointcloud::Unproject(depth.AsTensor(), utility::nullopt,
                                       points, utility::nullopt, intrinsics_host,
                                       extrinsics_host, depth_scale, depth_max,
                                       stride);
-        return PointCloud(points);
+
+        return PointCloud(points).UniformDownSample(every_k_points).Transform(transformation).Crop(aabb);
     }
 }
 

@@ -237,7 +237,9 @@ camera. Given depth value d at (u, v) image coordinate, the corresponding 3d poi
 
     - z = d / depth_scale
     - x = (u - cx) * z / fx
-    - y = (v - cy) * z / fy)",
+    - y = (v - cy) * z / fy)","every_k_points"_a,
+                    "transformation"_a,
+                    "aabb"_a,
                     "depth"_a, "intrinsic"_a,
                     "extrinsic"_a = Eigen::Matrix4d::Identity(),
                     "depth_scale"_a = 1000.0, "depth_trunc"_a = 1000.0,
@@ -420,7 +422,10 @@ camera. Given depth value d at (u, v) image coordinate, the corresponding 3d poi
               "Sampling factor to support coarse point cloud extraction."}});
     docstring::ClassMethodDocInject(
             m, "PointCloud", "lukas_create_and_scale",
-            {{"depth",
+            {{"every_k_points","number of points for downsampling"},
+             {"transformation", "The transformation"},
+             {"aabb", "Access aligned bounding box"},
+             {"depth",
               "The input depth image can be either a float image, or a "
               "uint16_t image."},
              {"intrinsic", "Intrinsic parameters of the camera."},
